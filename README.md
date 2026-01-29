@@ -48,8 +48,8 @@
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd second-brain-ai
+git clone https://github.com/JaineeraSuhas/SECOND-BRAIN.git
+cd SECOND-BRAIN
 
 # Install dependencies
 npm install
