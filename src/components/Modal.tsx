@@ -1,6 +1,6 @@
 import { ReactNode, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiX, FiCheckCircle, FiAlertCircle, FiInfo, FiAlertTriangle } from 'react-icons/fi';
+import { FiX } from 'react-icons/fi';
 
 interface ModalProps {
     isOpen: boolean;
