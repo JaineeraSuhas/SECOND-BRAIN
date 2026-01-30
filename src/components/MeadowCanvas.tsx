@@ -148,7 +148,7 @@ export default function MeadowCanvas() {
         let height = window.innerHeight;
         let pixelRatio = window.devicePixelRatio || 1;
 
-        let plants: Plant[] = [];
+        const plants: Plant[] = [];
         let raindrops: Raindrop[] = [];
 
         const resize = () => {
