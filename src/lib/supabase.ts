@@ -45,7 +45,7 @@ export type Node = {
     user_id: string;
     type: 'document' | 'concept' | 'person' | 'organization' | 'topic' | 'location';
     label: string;
-    properties: Record<string, any>;
+    properties: Record<string, unknown>;
     created_at: string;
 };
 
@@ -64,6 +64,6 @@ export type ChatMessage = {
     user_id: string;
     role: 'user' | 'assistant';
     content: string;
-    sources: any[];
+    sources: unknown[];
     created_at: string;
 };

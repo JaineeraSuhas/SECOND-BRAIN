@@ -10,6 +10,9 @@ import DashboardPage from './pages/DashboardPage';
 import GraphPage from './pages/GraphPage';
 import ChatPage from './pages/ChatPage';
 import DocumentsPage from './pages/DocumentsPage';
+import AboutPage from './pages/AboutPage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import { ToastContainer } from './components';
 
 function App() {
     const [user, setUser] = useState<User | null>(null);
@@ -43,28 +46,36 @@ function App() {
     }
 
     return (
-        <BrowserRouter>
-            <Routes>
-                {/* Public routes */}
-                <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
-                <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
+        <>
+            <ToastContainer />
+            <BrowserRouter>
+                <Routes>
+                    {/* Public routes */}
+                    <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
+                    <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
+                    <Route path="/about" element={<AboutPage />} />
 
-                {/* Protected routes */}
-                <Route
-                    path="/dashboard"
-                    element={user ? <DashboardPage /> : <Navigate to="/login" />}
-                />
-                <Route path="/graph" element={user ? <GraphPage /> : <Navigate to="/login" />} />
-                <Route path="/chat" element={user ? <ChatPage /> : <Navigate to="/login" />} />
-                <Route
-                    path="/documents"
-                    element={user ? <DocumentsPage /> : <Navigate to="/login" />}
-                />
+                    {/* Protected routes */}
+                    <Route
+                        path="/dashboard"
+                        element={user ? <DashboardPage /> : <Navigate to="/login" />}
+                    />
+                    <Route path="/graph" element={user ? <GraphPage /> : <Navigate to="/login" />} />
+                    <Route path="/chat" element={user ? <ChatPage /> : <Navigate to="/login" />} />
+                    <Route
+                        path="/documents"
+                        element={user ? <DocumentsPage /> : <Navigate to="/login" />}
+                    />
+                    <Route
+                        path="/analytics"
+                        element={user ? <AnalyticsPage /> : <Navigate to="/login" />}
+                    />
 
-                {/* Catch all */}
-                <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-        </BrowserRouter>
+                    {/* Catch all */}
+                    <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+            </BrowserRouter>
+        </>
     );
 }
 

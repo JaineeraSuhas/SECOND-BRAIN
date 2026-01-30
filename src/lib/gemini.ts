@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
 
 if (!GEMINI_API_KEY) {
     console.warn('Missing Gemini API key. AI features will be disabled.');
@@ -102,6 +102,30 @@ ${text}
 Summary:`;
 
         return this.generateContent(prompt);
+    }
+
+    async extractStructuredKnowledge(text: string): Promise<{ concepts: string[], summary: string }> {
+        const prompt = `Analyze the following text and extract key knowledge. 
+        Return a JSON object with two fields: 
+        1. "concepts": an array of short, high-level concept labels.
+        2. "summary": a one-sentence summary of the text.
+
+        Text: ${text}
+
+        JSON:`;
+
+        try {
+            const response = await this.generateContent(prompt);
+            const cleanJson = response.replace(/```json|```/g, '').trim();
+            const result = JSON.parse(cleanJson);
+            return {
+                concepts: Array.isArray(result.concepts) ? result.concepts : [],
+                summary: typeof result.summary === 'string' ? result.summary : ''
+            };
+        } catch (error) {
+            console.error('Failed to extract structured knowledge:', error);
+            return { concepts: [], summary: '' };
+        }
     }
 }
 

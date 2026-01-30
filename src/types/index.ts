@@ -26,7 +26,7 @@ export interface Node {
     user_id: string;
     type: 'document' | 'concept' | 'person' | 'organization' | 'topic' | 'location';
     label: string;
-    properties: Record<string, any>;
+    properties: Record<string, unknown>;
     created_at: string;
 }
 
