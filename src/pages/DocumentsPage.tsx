@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FiPlus, FiFile, FiTrash2, FiSearch, FiArrowLeft, FiMoreVertical, FiYoutube, FiLink, FiCheckCircle, FiLoader, FiX, FiGlobe } from 'react-icons/fi';
+import { FiPlus, FiFile, FiTrash2, FiSearch, FiArrowLeft, FiMoreVertical, FiYoutube, FiLink, FiCheckCircle, FiLoader, FiGlobe } from 'react-icons/fi';
 import { toast, Modal, NotionImport } from '../components';
 import { supabase } from '../lib/supabase';
 import { gemini } from '../lib/gemini';

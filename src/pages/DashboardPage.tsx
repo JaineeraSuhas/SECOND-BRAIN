@@ -2,15 +2,15 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { FileText, Grid3x3, MessageSquare, LogOut, Plus, TrendingUp, Activity, Zap, Loader } from 'lucide-react';
+import { FileText, Grid3x3, MessageSquare, LogOut, Plus, TrendingUp, Activity, Zap } from 'lucide-react';
 import { toast, AnimatedCounter, ParticleBackground, Logo } from '../components';
 
 export default function DashboardPage() {
     const navigate = useNavigate();
     const [stats, setStats] = useState([
-        { label: 'Documents', value: '...', pct: 0 },
-        { label: 'Concepts', value: '...', pct: 0 },
-        { label: 'Connections', value: '...', pct: 0 },
+        { label: 'Documents', value: 0, pct: 0 },
+        { label: 'Concepts', value: 0, pct: 0 },
+        { label: 'Connections', value: 0, pct: 0 },
     ]);
     const [loading, setLoading] = useState(true);
 

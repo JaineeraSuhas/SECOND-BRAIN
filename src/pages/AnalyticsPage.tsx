@@ -179,7 +179,7 @@ export default function AnalyticsPage() {
                                     Knowledge Growth (30 Days)
                                 </h3>
                                 <div className="h-48 flex items-end gap-1">
-                                    {data.knowledgeGrowth.map((point, idx) => (
+                                    {data.knowledgeGrowth.map((point, _idx) => (
                                         <div
                                             key={point.date}
                                             className="flex-1 bg-gradient-to-t from-purple-500 to-purple-300 rounded-t-sm transition-all hover:from-purple-600 hover:to-purple-400"

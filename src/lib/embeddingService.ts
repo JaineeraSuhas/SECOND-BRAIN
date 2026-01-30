@@ -1,4 +1,4 @@
-import { gemini } from './gemini';
+// Embedding service for semantic search and similarity
 
 /**
  * Embedding service for generating vector embeddings

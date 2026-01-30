@@ -19,7 +19,7 @@ export default function LandingPage() {
         setPermutation((prev) => (prev + 1) % variations.length);
     };
 
-    const getWordColor = (word: string, index: number) => {
+    const getWordColor = (_word: string, index: number) => {
         const colors = ['var(--color-purple)', 'var(--color-green)', 'var(--color-orange)'];
         return colors[index % colors.length];
     };

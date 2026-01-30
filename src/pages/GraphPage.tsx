@@ -1,18 +1,17 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiArrowLeft, FiInfo, FiLayers, FiMaximize, FiX, FiActivity, FiTarget, FiLink } from 'react-icons/fi';
+import { FiArrowLeft, FiLayers, FiMaximize, FiX, FiTarget, FiLink } from 'react-icons/fi';
 import ForceGraph3D from 'react-force-graph-3d';
 import { toast, ConnectionSuggestions } from '../components';
 import { supabase } from '../lib/supabase';
-import { graphService } from '../lib/graphService';
 import { neuralChimes } from '../utils/audio';
 
 export default function GraphPage() {
     const fgRef = useRef<any>();
     const [nodes, setNodes] = useState<any[]>([]);
     const [links, setLinks] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [_loading, setLoading] = useState(true);
     const [selectedNode, setSelectedNode] = useState<any>(null);
 
     useEffect(() => {
