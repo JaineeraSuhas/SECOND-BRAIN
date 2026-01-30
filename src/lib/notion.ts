@@ -61,11 +61,11 @@ export class NotionClient {
             const databases: NotionDatabase[] = [];
 
             for (const result of response.results) {
-                if (result.object === 'page') {
-                    const page = await this.getPage(result.id);
+                if ((result as any).object === 'page') {
+                    const page = await this.getPage((result as any).id);
                     if (page) pages.push(page);
-                } else if (result.object === 'database') {
-                    const db = await this.getDatabase(result.id);
+                } else if ((result as any).object === 'database') {
+                    const db = await this.getDatabase((result as any).id);
                     if (db) databases.push(db);
                 }
             }
@@ -133,7 +133,7 @@ export class NotionClient {
             return {
                 id: database.id,
                 title: this.extractDatabaseTitle(database),
-                properties: database.properties,
+                properties: (database as any).properties || {},
                 url: (database as any).url || `https://notion.so/${databaseId.replace(/-/g, '')}`
             };
         } catch (error) {
@@ -151,7 +151,7 @@ export class NotionClient {
         }
 
         try {
-            const response = await this.client.databases.query({
+            const response = await (this.client.databases as any).query({
                 database_id: databaseId
             });
 

@@ -12,11 +12,18 @@ export default function ParticleNetwork() {
 
         // Set canvas size
         const resizeCanvas = () => {
+            if (!canvas) return;
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         };
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!canvas) return;
+            // mouseX = e.clientX / canvas.width; // mouseX and mouseY are not defined yet
+            // mouseY = e.clientY / canvas.height;
+        };
 
         // Particle class
         class Particle {
@@ -27,8 +34,10 @@ export default function ParticleNetwork() {
             radius: number;
 
             constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
+                const w = canvas?.width || window.innerWidth;
+                const h = canvas?.height || window.innerHeight;
+                this.x = Math.random() * w;
+                this.y = Math.random() * h;
                 this.vx = (Math.random() - 0.5) * 0.5;
                 this.vy = (Math.random() - 0.5) * 0.5;
                 this.radius = 2;
@@ -38,8 +47,10 @@ export default function ParticleNetwork() {
                 this.x += this.vx;
                 this.y += this.vy;
 
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                const w = canvas?.width || window.innerWidth;
+                const h = canvas?.height || window.innerHeight;
+                if (this.x < 0 || this.x > w) this.vx *= -1;
+                if (this.y < 0 || this.y > h) this.vy *= -1;
             }
 
             draw() {

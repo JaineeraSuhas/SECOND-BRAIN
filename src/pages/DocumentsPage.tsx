@@ -44,7 +44,7 @@ export default function DocumentsPage() {
 
         setUploading(true);
         setShowIngestModal(false);
-        const toastId = toast.info(`Ingesting ${file.name}...`);
+        const _toastId = toast.info(`Ingesting ${file.name}...`);
 
         try {
             const { data: { user } } = await supabase.auth.getUser();

@@ -158,7 +158,7 @@ export class LODSystem {
  */
 export class FrustumCuller {
     private camera: any;
-    private frustum: any;
+    private _frustum: any;
 
     constructor() {
         // Will be initialized with Three.js camera

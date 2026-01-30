@@ -162,8 +162,8 @@ Respond in JSON format:
                                         key={nodeType.value}
                                         onClick={() => setType(nodeType.value as any)}
                                         className={`p-3 rounded-xl text-xs font-medium transition-all ${type === nodeType.value
-                                                ? 'bg-black text-white'
-                                                : 'bg-[#F3F3F2] hover:bg-[#EBEBEB]'
+                                            ? 'bg-black text-white'
+                                            : 'bg-[#F3F3F2] hover:bg-[#EBEBEB]'
                                             }`}
                                     >
                                         <div
