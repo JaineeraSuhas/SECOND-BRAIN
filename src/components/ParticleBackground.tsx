@@ -1,17 +1,36 @@
-import { useCallback } from 'react';
-import Particles from '@tsparticles/react';
+import { useEffect, useState, useMemo } from 'react';
+import Particles, { initParticlesEngine } from '@tsparticles/react';
 import { loadSlim } from '@tsparticles/slim';
-import type { Engine } from '@tsparticles/engine';
 
 export default function ParticleBackground() {
-    const particlesInit = useCallback(async (engine: Engine) => {
-        await loadSlim(engine);
+    const [init, setInit] = useState(false);
+    // Generate unique ID for each instance to prevent duplicates
+    const particlesId = useMemo(() => `tsparticles-${crypto.randomUUID()}`, []);
+
+    useEffect(() => {
+        // Only initialize once globally
+        let mounted = true;
+
+        initParticlesEngine(async (engine) => {
+            await loadSlim(engine);
+        }).then(() => {
+            if (mounted) {
+                setInit(true);
+            }
+        });
+
+        return () => {
+            mounted = false;
+        };
     }, []);
+
+    if (!init) {
+        return null;
+    }
 
     return (
         <Particles
-            id="tsparticles"
-            init={particlesInit}
+            id={particlesId}
             options={{
                 background: {
                     color: {

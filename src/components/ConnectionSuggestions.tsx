@@ -20,11 +20,13 @@ export default function ConnectionSuggestions({
     const [suggestions, setSuggestions] = useState<AIConnectionSuggestion[]>([]);
     const [loading, setLoading] = useState(false);
     const [processingId, setProcessingId] = useState<string | null>(null);
+    const [hasLoaded, setHasLoaded] = useState(false);
 
     const loadSuggestions = async () => {
         setLoading(true);
+        setHasLoaded(true);
         try {
-            const results = await graphService.getSuggestionsForNode(nodeId, 5);
+            const results = await graphService.getSuggestionsForNode(nodeId, 3); // Reduced from 5 to 3
             setSuggestions(results);
 
             if (results.length === 0) {

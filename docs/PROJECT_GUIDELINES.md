@@ -93,12 +93,12 @@ second-brain-ai/
     ├── 📄 App.tsx             # Root component with routing
     ├── 📄 index.css           # Global styles
     │
-    ├── 📁 components/         # Reusable UI components (19 files)
+    ├── 📁 components/         # Reusable UI components (27 files)
     ├── 📁 pages/              # Page components (8 files)
-    ├── 📁 hooks/              # Custom React hooks (4 files)
-    ├── 📁 lib/                # Third-party integrations (2 files)
+    ├── 📁 hooks/              # Custom React hooks (5 files)
+    ├── 📁 lib/                # Third-party integrations (7 files)
     ├── 📁 types/              # TypeScript definitions (1 file)
-    └── 📁 utils/              # Helper functions (4 files)
+    └── 📁 utils/              # Helper functions (5 files)
 ```
 
 ---
@@ -160,8 +160,17 @@ second-brain-ai/
 | **GapAnalysis** | `GapAnalysis.tsx` | Knowledge gap detection and suggestions |
 | **DataExport** | `DataExport.tsx` | Export functionality for data |
 | **GraphControls** | `GraphControls.tsx` | 3D graph manipulation controls |
+| **EnhancedGraphControls** | `EnhancedGraphControls.tsx` | Advanced graph controls with filters |
 | **GraphViewSelector** | `GraphViewSelector.tsx` | Switch between graph view modes |
+| **GraphModeSelector** | `GraphModeSelector.tsx` | Select graph visualization mode |
+| **GraphLegend** | `GraphLegend.tsx` | Interactive graph legend with node type toggles |
 | **AnimatedCounter** | `AnimatedCounter.tsx` | Number animation for stats |
+| **NotionImport** | `NotionImport.tsx` | Import content from Notion workspace |
+| **ConnectionSuggestions** | `ConnectionSuggestions.tsx` | AI-powered relationship suggestions |
+| **ManualNodeCreator** | `ManualNodeCreator.tsx` | Manually create knowledge graph nodes |
+| **CommandPalette** | `CommandPalette.tsx` | Keyboard shortcut command interface |
+| **QuickActionsBar** | `QuickActionsBar.tsx` | Quick access toolbar for common actions |
+| **ErrorBoundary** | `ErrorBoundary.tsx` | Error boundary for graceful error handling |
 
 ### Visual Effects Components
 

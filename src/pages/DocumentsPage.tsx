@@ -139,47 +139,36 @@ export default function DocumentsPage() {
 
             const { concepts, summary } = await gemini.extractStructuredKnowledge(promptContext);
 
-            // 1. Create Nodes and Links
-            for (const label of concepts) {
-                // Upsert Node (prevent duplicate concept labels for same user)
-                const { data: node, error: nodeError } = await supabase
-                    .from('nodes')
-                    .insert({
-                        user_id: userId,
-                        type: 'concept',
-                        label: label,
-                        properties: { weight: 2 }
-                    })
-                    .select()
-                    .single();
+            // 1. Create a node for the document itself
+            const { data: docNode } = await supabase
+                .from('nodes')
+                .insert({
+                    user_id: userId,
+                    type: 'document',
+                    label: doc.title,
+                    properties: { doc_id: doc.id }
+                })
+                .select()
+                .single();
 
-                if (!nodeError && node) {
-                    // 2. Create Edge (Link Doc -> Concept)
-                    await supabase.from('edges').insert({
-                        user_id: userId,
-                        source_id: node.id,
-                        target_id: node.id, // This is a placeholder for logic 
-                        // Wait, document isn't a node in the 'nodes' table yet.
-                        // We should make the document itself a node in the graph too.
-                    });
-                }
+            if (docNode) {
+                // 2. For each concept, create/find the concept node and link it to the document
+                for (const label of concepts) {
+                    // Try to find existing concept node first (prevent duplicates)
+                    let conceptNode;
+                    const { data: existingNode } = await supabase
+                        .from('nodes')
+                        .select('*')
+                        .eq('user_id', userId)
+                        .eq('type', 'concept')
+                        .eq('label', label)
+                        .maybeSingle();
 
-                // Better approach:
-                // 1. Create a node for the document itself
-                const { data: docNode } = await supabase
-                    .from('nodes')
-                    .insert({
-                        user_id: userId,
-                        type: 'document',
-                        label: doc.title,
-                        properties: { doc_id: doc.id }
-                    })
-                    .select()
-                    .single();
-
-                if (docNode) {
-                    for (const label of concepts) {
-                        const { data: conceptNode } = await supabase
+                    if (existingNode) {
+                        conceptNode = existingNode;
+                    } else {
+                        // Create new concept node if it doesn't exist
+                        const { data: newNode } = await supabase
                             .from('nodes')
                             .insert({
                                 user_id: userId,
@@ -188,20 +177,23 @@ export default function DocumentsPage() {
                             })
                             .select()
                             .single();
+                        conceptNode = newNode;
+                    }
 
-                        if (conceptNode) {
-                            await supabase.from('edges').insert({
-                                user_id: userId,
-                                source_id: docNode.id,
-                                target_id: conceptNode.id,
-                                type: 'relates_to',
-                                weight: 1.0
-                            });
-                            neuralChimes.chimeConnection();
-                        }
+                    if (conceptNode) {
+                        // Create edge linking document to concept
+                        await supabase.from('edges').insert({
+                            user_id: userId,
+                            source_id: docNode.id,
+                            target_id: conceptNode.id,
+                            type: 'relates_to',
+                            weight: 1.0
+                        });
+                        neuralChimes.chimeConnection();
                     }
                 }
             }
+
 
             await supabase
                 .from('documents')

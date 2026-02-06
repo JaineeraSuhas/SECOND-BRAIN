@@ -78,7 +78,7 @@ Respond in JSON format:
             }
 
             // Create node
-            const { data: node, error } = await supabase
+            const { error } = await supabase
                 .from('nodes')
                 .insert({
                     user_id: user.id,

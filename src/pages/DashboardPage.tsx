@@ -49,7 +49,7 @@ export default function DashboardPage() {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="min-h-screen bg-[#FBFBFA] selection:bg-[#F2EDFF] relative overflow-hidden"
+            className="min-h-screen bg-[var(--color-background)] selection:bg-[#F2EDFF] relative overflow-hidden"
         >
             <ParticleBackground />
             {/* Header */}

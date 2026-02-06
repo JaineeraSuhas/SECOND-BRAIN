@@ -1,8 +1,13 @@
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const GEMINI_API_KEYS = [
+    import.meta.env.VITE_GEMINI_API_KEY,
+    import.meta.env.VITE_GEMINI_API_KEY_2,
+    import.meta.env.VITE_GEMINI_API_KEY_3,
+].filter(Boolean); // Remove undefined keys
+
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
 
-if (!GEMINI_API_KEY) {
-    console.warn('Missing Gemini API key. AI features will be disabled.');
+if (GEMINI_API_KEYS.length === 0) {
+    console.warn('Missing Gemini API keys. AI features will be disabled.');
 }
 
 export interface GeminiResponse {
@@ -15,68 +20,82 @@ export interface GeminiResponse {
     }>;
 }
 
-// Rate limiter to prevent 429 errors (15 requests per minute limit)
+// Rate limiter with multi-key support
 class RateLimiter {
-    private queue: Array<() => Promise<void>> = [];
-    private processing = false;
-    private lastRequestTime = 0;
-    private readonly minDelay = 4000; // 4 seconds between requests (15 per minute)
+    private queues: Map<string, Array<() => Promise<void>>> = new Map();
+    private processing: Map<string, boolean> = new Map();
+    private lastRequestTime: Map<string, number> = new Map();
+    private readonly minDelay = 4000; // 4 seconds between requests per key
+    private currentKeyIndex = 0;
 
-    async add<T>(fn: () => Promise<T>): Promise<T> {
+    // Round-robin key selection
+    private getNextKey(): string {
+        if (GEMINI_API_KEYS.length === 0) return '';
+        const key = GEMINI_API_KEYS[this.currentKeyIndex];
+        this.currentKeyIndex = (this.currentKeyIndex + 1) % GEMINI_API_KEYS.length;
+        return key;
+    }
+
+    async add<T>(fn: (apiKey: string) => Promise<T>): Promise<T> {
+        const apiKey = this.getNextKey();
+        if (!apiKey) throw new Error('No API keys available');
+
+        if (!this.queues.has(apiKey)) {
+            this.queues.set(apiKey, []);
+            this.processing.set(apiKey, false);
+            this.lastRequestTime.set(apiKey, 0);
+        }
+
         return new Promise((resolve, reject) => {
-            this.queue.push(async () => {
+            this.queues.get(apiKey)!.push(async () => {
                 try {
-                    const result = await fn();
+                    const result = await fn(apiKey);
                     resolve(result);
                 } catch (error) {
                     reject(error);
                 }
             });
-            this.processQueue();
+            this.processQueue(apiKey);
         });
     }
 
-    private async processQueue() {
-        if (this.processing || this.queue.length === 0) return;
+    private async processQueue(apiKey: string) {
+        if (this.processing.get(apiKey) || !this.queues.get(apiKey)?.length) return;
 
-        this.processing = true;
+        this.processing.set(apiKey, true);
+        const queue = this.queues.get(apiKey)!;
 
-        while (this.queue.length > 0) {
+        while (queue.length > 0) {
             const now = Date.now();
-            const timeSinceLastRequest = now - this.lastRequestTime;
+            const timeSinceLastRequest = now - (this.lastRequestTime.get(apiKey) || 0);
 
             if (timeSinceLastRequest < this.minDelay) {
                 await new Promise(resolve => setTimeout(resolve, this.minDelay - timeSinceLastRequest));
             }
 
-            const task = this.queue.shift();
+            const task = queue.shift();
             if (task) {
-                this.lastRequestTime = Date.now();
+                this.lastRequestTime.set(apiKey, Date.now());
                 await task();
             }
         }
 
-        this.processing = false;
+        this.processing.set(apiKey, false);
     }
 }
 
 export class GeminiClient {
-    private apiKey: string;
     private rateLimiter = new RateLimiter();
 
-    constructor(apiKey?: string) {
-        this.apiKey = apiKey || GEMINI_API_KEY;
-    }
-
     async generateContent(prompt: string): Promise<string> {
-        if (!this.apiKey) {
+        if (GEMINI_API_KEYS.length === 0) {
             throw new Error('Gemini API key not configured');
         }
 
-        // Use rate limiter to prevent 429 errors
-        return this.rateLimiter.add(async () => {
+        // Use rate limiter with multi-key support
+        return this.rateLimiter.add(async (apiKey: string) => {
             try {
-                const response = await fetch(`${GEMINI_API_URL}?key=${this.apiKey}`, {
+                const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

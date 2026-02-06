@@ -199,7 +199,9 @@ Respond in JSON format:
 
                 try {
                     const response = await gemini.generateContent(prompt);
-                    const result = JSON.parse(response);
+                    // Clean markdown code blocks before parsing
+                    const cleanJson = response.replace(/```json|```/g, '').trim();
+                    const result = JSON.parse(cleanJson);
 
                     if (result.related && result.confidence >= threshold) {
                         suggestions.push({

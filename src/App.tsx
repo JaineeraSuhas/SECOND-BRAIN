@@ -13,6 +13,8 @@ import DocumentsPage from './pages/DocumentsPage';
 import AboutPage from './pages/AboutPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import { ToastContainer } from './components';
+import { CommandPalette } from './components/CommandPalette';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
     const [user, setUser] = useState<User | null>(null);
@@ -46,9 +48,10 @@ function App() {
     }
 
     return (
-        <>
+        <ErrorBoundary>
             <ToastContainer />
             <BrowserRouter>
+                <CommandPalette />
                 <Routes>
                     {/* Public routes */}
                     <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
@@ -75,7 +78,7 @@ function App() {
                     <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
             </BrowserRouter>
-        </>
+        </ErrorBoundary>
     );
 }
 

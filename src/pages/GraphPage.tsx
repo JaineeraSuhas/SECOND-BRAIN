@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { FiArrowLeft, FiLayers, FiMaximize, FiX, FiTarget, FiLink } from 'react-icons/fi';
 import ForceGraph3D from 'react-force-graph-3d';
 import { toast, ConnectionSuggestions } from '../components';
+import { GraphLegend, NodeTypeConfig } from '../components/GraphLegend';
 import { supabase } from '../lib/supabase';
 import { neuralChimes } from '../utils/audio';
 
@@ -13,6 +14,11 @@ export default function GraphPage() {
     const [links, setLinks] = useState<any[]>([]);
     const [_loading, setLoading] = useState(true);
     const [selectedNode, setSelectedNode] = useState<any>(null);
+    const [nodeTypes, setNodeTypes] = useState<NodeTypeConfig[]>([
+        { type: 'document', label: 'Documents', color: '#2c6469', visible: true },
+        { type: 'concept', label: 'Concepts', color: '#ebb137', visible: true },
+        { type: 'central', label: 'Core', color: '#3e3832', visible: true },
+    ]);
 
     useEffect(() => {
         fetchGraphData();
@@ -54,11 +60,13 @@ export default function GraphPage() {
                 type: n.type,
                 val: n.type === 'document' ? 5 : 2,
                 color: (colorMap as any)[n.type] || '#ccc',
-                properties: n.properties
+                properties: n.properties,
+                neighbors: [] as any[], // store neighbors for focus mode
+                links: [] as any[]
             }));
 
             if (processedNodes.length === 0) {
-                processedNodes.push({ id: 'genesis', name: 'Knowledge Root', type: 'central', val: 5, color: '#3e3832', properties: {} });
+                processedNodes.push({ id: 'genesis', name: 'Knowledge Root', type: 'central', val: 5, color: '#3e3832', properties: {}, neighbors: [], links: [] });
             }
 
             const processedLinks = (edgesData || []).map(e => ({
@@ -67,8 +75,24 @@ export default function GraphPage() {
                 type: e.type
             }));
 
+            // Compute neighbors
+            processedLinks.forEach(link => {
+                const a = processedNodes.find(n => n.id === link.source);
+                const b = processedNodes.find(n => n.id === link.target);
+                if (a && b) {
+                    a.neighbors.push(b);
+                    b.neighbors.push(a);
+                    a.links.push(link);
+                    b.links.push(link);
+                }
+            });
+
             setNodes(processedNodes);
             setLinks(processedLinks);
+
+            // Update node types if we find new ones
+            const types = new Set(processedNodes.map(n => n.type));
+            // Ensure we keep existing visibility state
         } catch (error: any) {
             toast.error(`Graph Sync Error: ${error.message}`);
         } finally {
@@ -76,7 +100,41 @@ export default function GraphPage() {
         }
     };
 
-    const graphData = useMemo(() => ({ nodes, links }), [nodes, links]);
+    const [focusNode, setFocusNode] = useState<any>(null);
+
+    const handleToggleType = (type: string) => {
+        setNodeTypes(prev => prev.map(t =>
+            t.type === type ? { ...t, visible: !t.visible } : t
+        ));
+    };
+
+    const graphData = useMemo(() => {
+        // 1. Filter by Focus Mode
+        if (focusNode) {
+            const neighborIds = new Set(focusNode.neighbors.map((n: any) => n.id));
+            neighborIds.add(focusNode.id);
+
+            const focusedNodes = nodes.filter(n => neighborIds.has(n.id));
+            const focusedLinks = links.filter(l =>
+                neighborIds.has(typeof l.source === 'object' ? l.source.id : l.source) &&
+                neighborIds.has(typeof l.target === 'object' ? l.target.id : l.target)
+            );
+
+            return { nodes: focusedNodes, links: focusedLinks };
+        }
+
+        // 2. Filter by Legend Visibility
+        const visibleTypes = new Set(nodeTypes.filter(t => t.visible).map(t => t.type));
+        const filteredNodes = nodes.filter(n => visibleTypes.has(n.type));
+        const filteredNodeIds = new Set(filteredNodes.map(n => n.id));
+
+        const filteredLinks = links.filter(l =>
+            filteredNodeIds.has(typeof l.source === 'object' ? l.source.id : l.source) &&
+            filteredNodeIds.has(typeof l.target === 'object' ? l.target.id : l.target)
+        );
+
+        return { nodes: filteredNodes, links: filteredLinks };
+    }, [nodes, links, nodeTypes, focusNode]);
 
     const handleNodeClick = (node: any) => {
         setSelectedNode(node);
@@ -97,7 +155,7 @@ export default function GraphPage() {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="min-h-screen bg-[#FBFBFA] flex flex-col relative overflow-hidden"
+            className="min-h-screen bg-[var(--color-background)] flex flex-col relative overflow-hidden"
         >
             {/* Header Overlay */}
             <header className="absolute top-0 left-0 right-0 z-50 bg-transparent pointer-events-none">
@@ -192,10 +250,21 @@ export default function GraphPage() {
 
                         <div className="p-8 bg-[#FAFAFA] border-t border-[#EBEBEB]">
                             <button
-                                onClick={() => toast.info('Focus protocol initiated.')}
-                                className="w-full py-4 bg-black text-white rounded-2xl text-[10px] uppercase tracking-widest font-bold hover:bg-gray-800 transition-all shadow-lg"
+                                onClick={() => {
+                                    if (focusNode && focusNode.id === selectedNode.id) {
+                                        setFocusNode(null);
+                                        toast.info('Context isolation cleared.');
+                                    } else {
+                                        setFocusNode(selectedNode);
+                                        toast.success('Focus protocol initiated: Isolating context.');
+                                    }
+                                }}
+                                className={`w-full py-4 rounded-2xl text-[10px] uppercase tracking-widest font-bold transition-all shadow-lg ${focusNode && focusNode.id === selectedNode.id
+                                    ? 'bg-red-50 text-red-500 hover:bg-red-100'
+                                    : 'bg-black text-white hover:bg-gray-800'
+                                    }`}
                             >
-                                Isolate Context
+                                {focusNode && focusNode.id === selectedNode.id ? 'Clear Isolation' : 'Isolate Context'}
                             </button>
                         </div>
                     </motion.div>
@@ -226,7 +295,7 @@ export default function GraphPage() {
             </div>
 
             {/* 3D Graph */}
-            <div className="flex-1 w-full h-screen bg-[#FBFBFA]">
+            <div className="flex-1 w-full h-screen bg-[var(--color-background)]">
                 <ForceGraph3D
                     ref={fgRef}
                     graphData={graphData}
@@ -235,13 +304,15 @@ export default function GraphPage() {
                     nodeRelSize={4}
                     linkWidth={0.8}
                     linkColor={() => '#EBEBEB'}
-                    backgroundColor="#FBFBFA"
+                    backgroundColor="rgba(0,0,0,0)"
                     showNavInfo={false}
                     controlType="orbit"
                     cooldownTicks={100}
                     onNodeClick={handleNodeClick}
                 />
             </div>
+
+            <GraphLegend types={nodeTypes} onToggle={handleToggleType} />
         </motion.div>
     );
 }

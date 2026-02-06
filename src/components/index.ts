@@ -22,6 +22,7 @@ export { default as ManualNodeCreator } from './ManualNodeCreator';
 export { default as GraphModeSelector } from './GraphModeSelector';
 export { default as EnhancedGraphControls } from './EnhancedGraphControls';
 export { default as QuickActionsBar } from './QuickActionsBar';
-
+export { GraphLegend } from './GraphLegend';
+export { default as ErrorBoundary } from './ErrorBoundary';
 
 

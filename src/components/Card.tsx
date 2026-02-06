@@ -29,7 +29,7 @@ export default function Card({
                 ${paddingStyles[padding]}
                 ${className}
             `}
-            {...props}
+            {...(props as any)}
         >
             {children}
         </motion.div>

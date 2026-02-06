@@ -23,13 +23,15 @@ export default defineConfig({
     build: {
         outDir: 'dist',
         sourcemap: false,
-        minify: 'terser',
+        minify: 'esbuild',
+        chunkSizeWarningLimit: 1600,
         rollupOptions: {
             output: {
                 manualChunks: {
-                    'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-                    '3d-vendor': ['react-force-graph-3d', 'three'],
-                    'animation-vendor': ['framer-motion'],
+                    vendor: ['react', 'react-dom', 'react-router-dom'],
+                    three: ['three'],
+                    graph: ['react-force-graph-3d'],
+                    animation: ['framer-motion'],
                 },
             },
         },

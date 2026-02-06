@@ -10,18 +10,25 @@
   :root {
     --color-white: #f6f2e5;
     --color-black: #3e3832;
+    --color-gray-100: #f5f5f5;
+    /* Light gray for light mode */
+    --color-gray-200: #e5e5e5;
     --color-green: #2c6469;
     --color-purple: #b20155;
     --color-orange: #df6536;
     --color-blue: #3469a1;
     --color-yellow: #ebb137;
+
     --color-background: var(--color-white);
     --color-text: var(--color-black);
+    --color-card-bg: rgba(255, 255, 255, 0.7);
+    --color-border: rgba(255, 255, 255, 0.5);
+
     --margin: 20px;
   }
 
   * {
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, opacity 0.3s ease, border-color 0.3s ease;
   }
 
   body {
@@ -73,10 +80,10 @@
   }
 
   .liquid-glass {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--color-card-bg);
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-border);
     box-shadow: 0 32px 80px rgba(0, 0, 0, 0.06);
   }
 
