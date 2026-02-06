@@ -56,6 +56,16 @@ class NeuralChimes {
     chimePulse() {
         this.playTone(261.63, 2, 0.02); // C4
     }
+
+    /**
+     * Initialize audio context on first user interaction
+     */
+    async init() {
+        const ctx = this.getContext();
+        if (ctx.state === 'suspended') {
+            await ctx.resume();
+        }
+    }
 }
 
 export const neuralChimes = new NeuralChimes();
